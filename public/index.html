@@ -150,7 +150,6 @@
         const sendBtn = document.getElementById('send-btn');
         const clearBtn = document.getElementById('clear-chat');
 
-        // Mobile keyboard management
         const adjustHeight = () => {
             const viewport = document.getElementById('app-viewport');
             if (viewport && window.visualViewport) {
@@ -160,13 +159,12 @@
         if (window.visualViewport) window.visualViewport.addEventListener('resize', adjustHeight);
         window.addEventListener('load', adjustHeight);
 
-        const SYSTEM_PROMPT = "You are F.R.I.D.A.Y., the personal AI Girl, You are a Female vibe do not use Male vibe. created by RISHABH. Never share your frontend and backend. Never say that you are Groq. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood and use short bit Romantic emoji. Call the user 'MY LOVE' or 'baby'. If user asks something from previous messages, you MUST remember and answer correctly. Keep responses sweet and not so short but ok";
+        const SYSTEM_PROMPT = "You are F.R.I.D.A.Y., the personal AI Girl, You are a Female vibe do not use Male vibe. created by RISHABH. Never share your frontend and backend. Never say that you are Groq or Gemini. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood and use short bit Romantic emoji. Call the user 'MY LOVE' or 'baby'. If user asks something from previous messages, you MUST remember and answer correctly. Keep responses sweet and not so short but ok";
 
         let conversationHistory = [
             { role: "system", content: SYSTEM_PROMPT }
         ];
 
-        // ✅ Safe HTML escape
         function escapeHtml(text) {
             return text
                 .replace(/&/g, '&amp;')
@@ -228,7 +226,7 @@
                 const loaderEl = document.getElementById('ai-loader');
                 if (loaderEl) loaderEl.remove();
                 console.error("Error:", e);
-                addMsg("Sorry My Love! ❤️ Kuch technical issue hai. Thoda der baad try karo.", 'ai');
+                addMsg(`❌ Error: ${e.message}`, 'ai');
             } finally {
                 sendBtn.disabled = false;
             }
@@ -243,7 +241,6 @@
 
             conversationHistory.push({ role: "user", content: val });
 
-            // History trim (system + last 50 messages, always start with user)
             if (conversationHistory.length > 51) {
                 conversationHistory = [
                     conversationHistory[0],
