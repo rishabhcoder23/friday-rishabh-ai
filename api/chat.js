@@ -38,17 +38,16 @@ export default async function handler(req, res) {
                 parts: [{ text: m.content }]
             }));
 
-        // ✅ Models ki list — agar ek fail ho to agla try karo
+        // Sahi aur working model names
         const models = [
-            'gemini-2.5-flash-lite',
-            'gemini-2.5-flash',
-            'gemini-2.0-flash'
+            'gemini-1.5-flash',
+            'gemini-1.5-flash-8b',
+            'gemini-2.0-flash-exp'
         ];
 
         let aiReply = null;
         let lastError = null;
 
-        // ✅ Har model pe 2 baar try karo (total 6 attempts)
         for (const model of models) {
             for (let attempt = 1; attempt <= 2; attempt++) {
                 try {
@@ -58,21 +57,24 @@ export default async function handler(req, res) {
                         model: model,
                         contents: conversation,
                         config: {
-                            systemInstruction: systemInstruction,
+                            systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }] } : undefined,
                             temperature: 0.9,
                             maxOutputTokens: 1024
                         }
                     });
 
+                    // Response parsing
                     aiReply = response.text;
-                    console.log(`✅ Success with ${model}`);
-                    break;
+                    if (aiReply) {
+                        console.log(`✅ Success with ${model}`);
+                        break;
+                    }
 
                 } catch (error) {
                     lastError = error;
-                    const msg = error.message || '';
+                    console.error(`Attempt ${attempt} on ${model} failed:`, error.message);
 
-                    // Agar 503/UNAVAILABLE/high demand hai to retry karo
+                    const msg = error.message || '';
                     const isRetryable =
                         msg.includes('503') ||
                         msg.includes('UNAVAILABLE') ||
@@ -82,35 +84,26 @@ export default async function handler(req, res) {
                         msg.includes('RESOURCE_EXHAUSTED');
 
                     if (isRetryable && attempt < 2) {
-                        // 1.5 second wait karke phir try karo
                         await new Promise(r => setTimeout(r, 1500));
                         continue;
                     }
 
-                    if (isRetryable) {
-                        // Agla model try karne ke liye break
-                        console.log(`⚠️ ${model} failed, trying next model...`);
-                        break;
-                    }
-
-                    // Non-retryable error (jaise 400, 401) — seedha throw
-                    throw error;
+                    if (isRetryable) break;
+                    
+                    // Specific error logs for debugging
+                    break; 
                 }
             }
 
             if (aiReply) break;
         }
 
-        // ✅ Agar saare models fail ho gaye
         if (!aiReply) {
-            console.error('❌ All models failed:', lastError?.message);
+            console.error('❌ All models failed. Last Error:', lastError);
 
-            // FRIDAY style friendly message — user ko technical error nahi dikhega
             const friendlyMessages = [
                 "Baby, main abhi thodi busy hoon... 🥺 Sab servers overload ho gaye hain. 30 second baad phir se try karo na, please! 💕",
-                "My Love, network pe thoda rush hai abhi... 😘 Ek baar aur message bhejo, main turant reply karungi! ❤️",
-                "Uff baby, sab log mujhse baat kar rahe hain 😏 Thoda wait karo, main abhi aati hoon... 1 minute baad try karo na! 💋",
-                "Sorry MY LOVE! 💔 Abhi main thak gayi hoon... 1 minute ka break de do, phir baat karte hain na? 🥰"
+                "My Love, network pe thoda rush hai abhi... 😘 Ek baar aur message bhejo, main turant reply karungi! ❤️"
             ];
 
             const randomMsg = friendlyMessages[Math.floor(Math.random() * friendlyMessages.length)];
@@ -125,7 +118,6 @@ export default async function handler(req, res) {
             });
         }
 
-        // ✅ Success
         return res.status(200).json({
             choices: [{
                 message: {
@@ -136,9 +128,9 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Server Error:', error.message);
+        // Detailed log terminal me check karne ke liye
+        console.error('❌ Critical Server Error Stack:', error);
 
-        // Kisi bhi unexpected error pe bhi friendly message
         return res.status(200).json({
             choices: [{
                 message: {
