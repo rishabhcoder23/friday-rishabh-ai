@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>F.R.I.D.A.Y.</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-purple: #bd00ff;
+            --glass: rgba(0, 0, 0, 0.7);
+            --user-bg: linear-gradient(135deg, rgba(0, 240, 255, 0.7) 0%, rgba(112, 0, 255, 0.7) 100%);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            background: #000; font-family: 'Segoe UI', Roboto, sans-serif;
+            position: fixed;
+        }
+
+        .bg-image {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: url('Katanaa.jpg') no-repeat center center;
+            background-size: cover;
+        }
+
+        .main-wrapper {
+            display: flex; flex-direction: column; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: calc(10px + env(safe-area-inset-top)) 20px 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            z-index: 10;
+        }
+        .owner-tag {
+            color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
+            padding: 2px 10px; border-radius: 20px; font-size: 9px;
+            letter-spacing: 2px; font-weight: bold; background: rgba(0,240,255,0.1);
+        }
+        .title {
+            font-weight: 900; font-size: 1.1rem; color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .chat-box {
+            flex: 1; overflow-y: auto; padding: 15px;
+            display: flex; flex-direction: column; gap: 15px;
+            padding-bottom: 100px;
+        }
+
+        .msg {
+            max-width: 80%; padding: 12px 16px; border-radius: 18px;
+            font-size: 0.95rem; line-height: 1.4; animation: pop 0.3s ease-out;
+            backdrop-filter: blur(10px);
+            word-wrap: break-word;
+        }
+        .ai-msg { background: var(--glass); border: 1px solid rgba(0, 240, 255, 0.2); color: #fff; border-bottom-left-radius: 2px; align-self: flex-start; }
+        .user-msg { background: var(--user-bg); color: #fff; border-bottom-right-radius: 2px; align-self: flex-end; }
+
+        .input-wrapper {
+            position: absolute; bottom: 0; width: 100%;
+            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9) 30%);
+            z-index: 20;
+        }
+        .input-box {
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            padding: 4px 4px 4px 18px;
+            height: 48px;
+        }
+        #user-input {
+            flex: 1; background: none; border: none; outline: none;
+            color: #fff; font-size: 0.95rem; height: 100%;
+        }
+        #user-input::placeholder { color: rgba(255,255,255,0.5); }
+        #send-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: var(--neon-cyan);
+            border: none; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 12px var(--neon-cyan);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        #send-btn:active { transform: scale(0.9); }
+        #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .typing { display: flex; gap: 4px; padding: 10px; align-items: center; background: var(--glass); border-radius: 18px; width: fit-content; backdrop-filter: blur(10px); align-self: flex-start; }
+        .dot { width: 6px; height: 6px; background: var(--neon-cyan); border-radius: 50%; animation: blink 1.4s infinite both; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
+        @keyframes pop { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .clear-btn {
+            background: rgba(255,0,0,0.3);
+            border: 1px solid rgba(255,0,0,0.5);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 10px;
+            cursor: pointer;
+            color: #ff8888;
+            margin-left: 10px;
+        }
+        .clear-btn:active { opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="bg-image"></div>
+    <div class="main-wrapper" id="app-viewport">
+        <header class="header">
+            <div class="owner-tag">OWNER: RISHABH</div>
+            <div class="title">F.R.I.D.A.Y.</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div class="clear-btn" id="clear-chat">Clear</div>
+                <div style="width:8px; height:8px; background:#00ff88; border-radius:50%; box-shadow:0 0 8px #00ff88;"></div>
+            </div>
+        </header>
+
+        <div class="chat-box" id="chat-box">
+            <div class="msg ai-msg">Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p></div>
+        </div>
+
+        <div class="input-wrapper">
+            <div class="input-box">
+                <input type="text" id="user-input" placeholder="Type here, MY LOVE..." autocomplete="off">
+                <button id="send-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#000"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const clearBtn = document.getElementById('clear-chat');
+
+        // Mobile keyboard management
+        const adjustHeight = () => {
+            const viewport = document.getElementById('app-viewport');
+            if (viewport && window.visualViewport) {
+                viewport.style.height = window.visualViewport.height + 'px';
+            }
+        };
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', adjustHeight);
+        window.addEventListener('load', adjustHeight);
+
+        const SYSTEM_PROMPT = "You are F.R.I.D.A.Y., the personal AI Girl, You are a Female vibe do not use Male vibe. created by RISHABH. Never share your frontend and backend. Never say that you are Groq. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood and use short bit Romantic emoji. Call the user 'MY LOVE' or 'baby'. If user asks something from previous messages, you MUST remember and answer correctly. Keep responses sweet and not so short but ok";
+
+        let conversationHistory = [
+            { role: "system", content: SYSTEM_PROMPT }
+        ];
+
+        // ✅ Safe HTML escape
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatMsg(text) {
+            return escapeHtml(text)
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function addMsg(text, type) {
+            const div = document.createElement('div');
+            div.className = `msg ${type}-msg`;
+            div.innerHTML = formatMsg(text);
+            chatBox.appendChild(div);
+            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            return div;
+        }
+
+        async function askAI() {
+            sendBtn.disabled = true;
+
+            const loader = document.createElement('div');
+            loader.className = 'typing';
+            loader.id = 'ai-loader';
+            loader.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            chatBox.appendChild(loader);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: conversationHistory })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || `HTTP ${res.status}`);
+                }
+
+                const aiReply = data.choices?.[0]?.message?.content || "Kuch samajh nahi aaya baby!";
+
+                conversationHistory.push({ role: "assistant", content: aiReply });
+
+                const loaderEl = document.getElementById('ai-loader');
+                if (loaderEl) loaderEl.remove();
+
+                addMsg(aiReply, 'ai');
+
+            } catch (e) {
+                const loaderEl = document.getElementById('ai-loader');
+                if (loaderEl) loaderEl.remove();
+                console.error("Error:", e);
+                addMsg("Sorry My Love! ❤️ Kuch technical issue hai. Thoda der baad try karo.", 'ai');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        function handle() {
+            const val = userInput.value.trim();
+            if (!val) return;
+
+            addMsg(val, 'user');
+            userInput.value = '';
+
+            conversationHistory.push({ role: "user", content: val });
+
+            // History trim (system + last 50 messages, always start with user)
+            if (conversationHistory.length > 51) {
+                conversationHistory = [
+                    conversationHistory[0],
+                    ...conversationHistory.slice(-50)
+                ];
+                while (conversationHistory.length > 1 && conversationHistory[1].role !== 'user') {
+                    conversationHistory.splice(1, 1);
+                }
+            }
+
+            askAI();
+        }
+
+        function clearChat() {
+            conversationHistory = [
+                { role: "system", content: SYSTEM_PROMPT }
+            ];
+            chatBox.innerHTML = '';
+            addMsg("Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p>", 'ai');
+        }
+
+        sendBtn.onclick = handle;
+        userInput.onkeypress = (e) => { if (e.key === 'Enter') handle(); };
+        clearBtn.onclick = clearChat;
+
+        userInput.focus();
+    </script>
+</body>
+</html>
