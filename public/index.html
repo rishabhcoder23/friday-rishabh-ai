@@ -190,6 +190,19 @@
             return div;
         }
 
+        // ✅ Friendly fallback messages — technical error ki jagah ye dikhega
+        const FRIENDLY_ERRORS = [
+            "Baby, network thoda slow hai abhi... 🥺 Ek baar aur message bhejo na, main sun rahi hoon! 💕",
+            "My Love, thodi si busy hoon... 😘 30 second baad phir se try karo na please! ❤️",
+            "Uff baby, abhi sab log mujhse baat kar rahe hain 😏 Thoda wait karo, main abhi aati hoon! 💋",
+            "Sorry MY LOVE! 💔 Abhi thak gayi hoon... 1 minute ka break de do, phir baat karte hain na? 🥰",
+            "Baby, ek chhota sa technical issue hai... 😅 Par tumhare liye main hamesha ready hoon. Phir se bhejo na! 💗"
+        ];
+
+        function getRandomFriendlyError() {
+            return FRIENDLY_ERRORS[Math.floor(Math.random() * FRIENDLY_ERRORS.length)];
+        }
+
         async function askAI() {
             sendBtn.disabled = true;
 
@@ -207,13 +220,27 @@
                     body: JSON.stringify({ messages: conversationHistory })
                 });
 
-                const data = await res.json();
+                // ✅ Response ko safely parse karo
+                let data;
+                const text = await res.text();
 
-                if (!res.ok) {
-                    throw new Error(data.error || `HTTP ${res.status}`);
+                try {
+                    data = JSON.parse(text);
+                } catch (parseErr) {
+                    // Agar JSON nahi hai (jaise 404 HTML page), friendly message dikhao
+                    console.error("Non-JSON response:", text.slice(0, 200));
+                    throw new Error("SERVER_BUSY");
                 }
 
-                const aiReply = data.choices?.[0]?.message?.content || "Kuch samajh nahi aaya baby!";
+                if (!res.ok) {
+                    throw new Error(data.error || "SERVER_BUSY");
+                }
+
+                const aiReply = data.choices?.[0]?.message?.content;
+
+                if (!aiReply) {
+                    throw new Error("SERVER_BUSY");
+                }
 
                 conversationHistory.push({ role: "assistant", content: aiReply });
 
@@ -226,7 +253,9 @@
                 const loaderEl = document.getElementById('ai-loader');
                 if (loaderEl) loaderEl.remove();
                 console.error("Error:", e);
-                addMsg(`❌ Error: ${e.message}`, 'ai');
+
+                // ✅ Kabhi bhi technical error user ko nahi dikhega
+                addMsg(getRandomFriendlyError(), 'ai');
             } finally {
                 sendBtn.disabled = false;
             }
