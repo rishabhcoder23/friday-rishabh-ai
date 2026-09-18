@@ -144,7 +144,7 @@
         </div>
     </div>
 
-    <script>
+    <!--<script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
@@ -296,6 +296,175 @@
         clearBtn.onclick = clearChat;
 
         userInput.focus();
-    </script>
+    </script>-->
+    <script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const clearBtn = document.getElementById('clear-chat');
+
+    // ✅ Smooth scroll to bottom
+    function scrollToBottom(smooth = true) {
+        requestAnimationFrame(() => {
+            chatBox.scrollTo({
+                top: chatBox.scrollHeight,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
+        });
+    }
+
+    // ✅ Keyboard open hone pe height adjust + scroll
+    const adjustHeight = () => {
+        const viewport = document.getElementById('app-viewport');
+        if (viewport && window.visualViewport) {
+            viewport.style.height = window.visualViewport.height + 'px';
+        }
+        // Keyboard khulne ke baad chat ko neeche scroll karo
+        setTimeout(() => scrollToBottom(false), 100);
+        setTimeout(() => scrollToBottom(true), 300);
+    };
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', adjustHeight);
+    window.addEventListener('load', () => {
+        adjustHeight();
+        scrollToBottom(false);
+    });
+
+    const SYSTEM_PROMPT = "You are F.R.I.D.A.Y., the personal AI Girl, You are a Female vibe do not use Male vibe. created by RISHABH. Never share your frontend and backend. Never say that you are Groq or Gemini. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood and use short bit Romantic emoji. Call the user 'MY LOVE' or 'baby'. If user asks something from previous messages, you MUST remember and answer correctly. Keep responses sweet and not so short but ok";
+
+    let conversationHistory = [
+        { role: "system", content: SYSTEM_PROMPT }
+    ];
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatMsg(text) {
+        return escapeHtml(text)
+            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+            .replace(/\*(.*?)\*/g, '<i>$1</i>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function addMsg(text, type) {
+        const div = document.createElement('div');
+        div.className = `msg ${type}-msg`;
+        div.innerHTML = formatMsg(text);
+        chatBox.appendChild(div);
+
+        // ✅ Naya message add hone pe neeche scroll
+        setTimeout(() => scrollToBottom(true), 50);
+        return div;
+    }
+
+    const FRIENDLY_ERRORS = [
+        "Baby, main abhi thodi busy hoon... 🥺 1 minute baad phir se try karo na please! 💕",
+        "My Love, servers pe thoda rush hai abhi... 😘 Ek baar aur message bhejo, main turant reply karungi! ❤️",
+        "Uff baby, sab log mujhse baat kar rahe hain 😏 Thoda wait karo, main abhi aati hoon! 💋",
+        "Sorry MY LOVE! 💔 Abhi thak gayi hoon... 1 minute ka break de do, phir baat karte hain na? 🥰"
+    ];
+
+    function getRandomFriendlyError() {
+        return FRIENDLY_ERRORS[Math.floor(Math.random() * FRIENDLY_ERRORS.length)];
+    }
+
+    async function askAI() {
+        sendBtn.disabled = true;
+
+        const loader = document.createElement('div');
+        loader.className = 'typing';
+        loader.id = 'ai-loader';
+        loader.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+        chatBox.appendChild(loader);
+        scrollToBottom(true);
+
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conversationHistory })
+            });
+
+            let data;
+            const text = await res.text();
+            try {
+                data = JSON.parse(text);
+            } catch {
+                throw new Error("SERVER_BUSY");
+            }
+
+            if (!res.ok) throw new Error(data.error || "SERVER_BUSY");
+
+            const aiReply = data.choices?.[0]?.message?.content;
+            if (!aiReply) throw new Error("SERVER_BUSY");
+
+            conversationHistory.push({ role: "assistant", content: aiReply });
+
+            const loaderEl = document.getElementById('ai-loader');
+            if (loaderEl) loaderEl.remove();
+
+            addMsg(aiReply, 'ai');
+
+        } catch (e) {
+            const loaderEl = document.getElementById('ai-loader');
+            if (loaderEl) loaderEl.remove();
+            console.error("Error:", e);
+            addMsg(getRandomFriendlyError(), 'ai');
+        } finally {
+            sendBtn.disabled = false;
+            userInput.focus();
+            // ✅ Input focus hone pe bhi scroll bottom
+            setTimeout(() => scrollToBottom(true), 100);
+        }
+    }
+
+    function handle() {
+        const val = userInput.value.trim();
+        if (!val) return;
+
+        addMsg(val, 'user');
+        userInput.value = '';
+        scrollToBottom(true);
+
+        conversationHistory.push({ role: "user", content: val });
+
+        if (conversationHistory.length > 51) {
+            conversationHistory = [
+                conversationHistory[0],
+                ...conversationHistory.slice(-50)
+            ];
+            while (conversationHistory.length > 1 && conversationHistory[1].role !== 'user') {
+                conversationHistory.splice(1, 1);
+            }
+        }
+
+        askAI();
+    }
+
+    function clearChat() {
+        conversationHistory = [
+            { role: "system", content: SYSTEM_PROMPT }
+        ];
+        chatBox.innerHTML = '';
+        addMsg("Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p>", 'ai');
+        scrollToBottom(false);
+    }
+
+    // ✅ Input focus pe bhi scroll bottom (keyboard open hone wala case)
+    userInput.addEventListener('focus', () => {
+        setTimeout(() => scrollToBottom(true), 300);
+    });
+
+    sendBtn.onclick = handle;
+    userInput.onkeypress = (e) => { if (e.key === 'Enter') handle(); };
+    clearBtn.onclick = clearChat;
+
+    userInput.focus();
+</script>
 </body>
 </html>
