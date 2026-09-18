@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-    // CORS headers (safety ke liye)
+    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -18,40 +18,55 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Messages array required' });
     }
 
-    const API_KEY = process.env.GROQ_API_KEY;
+    const API_KEY = process.env.GEMINI_API_KEY;
 
     if (!API_KEY) {
-        return res.status(500).json({ error: 'API key not configured on server' });
+        console.error('❌ GEMINI_API_KEY is missing');
+        return res.status(500).json({
+            error: 'API key not configured. Add GEMINI_API_KEY in Vercel environment variables.'
+        });
     }
 
     try {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
-                messages: messages,
+        // Gemini SDK import
+        const { GoogleGenAI } = await import('@google/genai');
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+        // Gemini format: system prompt alag, messages Contents me convert karo
+        const systemInstruction = messages.find(m => m.role === 'system')?.content || '';
+        const conversation = messages
+            .filter(m => m.role !== 'system')
+            .map(m => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+            }));
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: conversation,
+            config: {
+                systemInstruction: systemInstruction,
                 temperature: 0.9,
-                max_tokens: 1024
-            })
+                maxOutputTokens: 1024
+            }
         });
 
-        const data = await response.json();
+        const aiReply = response.text || 'Kuch samajh nahi aaya baby!';
 
-        if (!response.ok) {
-            console.error('Groq API Error:', data);
-            return res.status(response.status).json({
-                error: data.error?.message || 'Groq API error'
-            });
-        }
-
-        return res.status(200).json(data);
+        // OpenAI-compatible format return karo (frontend ke liye)
+        return res.status(200).json({
+            choices: [
+                {
+                    message: {
+                        role: 'assistant',
+                        content: aiReply
+                    }
+                }
+            ]
+        });
 
     } catch (error) {
-        console.error('Server Error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('❌ Gemini Error:', error.message);
+        return res.status(500).json({ error: `Server error: ${error.message}` });
     }
 }
