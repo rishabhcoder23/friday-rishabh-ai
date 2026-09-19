@@ -2,143 +2,647 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>RIORA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>R.I.O.R.A.</title>
     <style>
         :root {
             --neon-cyan: #00f0ff;
             --neon-purple: #bd00ff;
-            --glass: rgba(0, 0, 0, 0.7);
-            --user-bg: linear-gradient(135deg, rgba(0, 240, 255, 0.7) 0%, rgba(112, 0, 255, 0.7) 100%);
+            --neon-pink: #ff2fd6;
+            --glass: rgba(8, 14, 24, 0.72);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            margin: 0; 
+            padding: 0; 
+        }
 
         html, body {
-            width: 100%; height: 100%; overflow: hidden;
-            background: #000; font-family: 'Segoe UI', Roboto, sans-serif;
-            position: fixed;
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            color: #e8f6ff;
+            overscroll-behavior: none;
+            touch-action: none;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        .bg-image {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: url('R.jpg') no-repeat center center;
-            background-size: cover;
+        /* ===== BACKGROUND STAGE ===== */
+        .bg-stage {
+            position: fixed; inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 20% 0%, #0a1a2e 0%, #05080f 45%, #000 100%),
+                radial-gradient(circle at 80% 100%, rgba(189, 0, 255, 0.18), transparent 55%);
+            pointer-events: none;
         }
 
+        .bg-ring {
+            position: fixed; top: 50%; left: 50%;
+            width: 150vmax; height: 150vmax;
+            margin: -75vmax 0 0 -75vmax;
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 42%, rgba(0, 240, 255, 0.06) 55%, transparent 72%);
+            animation: slowSpin 70s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes slowSpin { to { transform: rotate(360deg); } }
+
+        /* ===== PARTICLES FLOWING UP ===== */
+        .particles {
+            position: fixed; inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2.5px;
+            height: 2.5px;
+            border-radius: 50%;
+            bottom: -10px;
+            opacity: 0;
+            animation: rise linear infinite;
+        }
+        .particle:nth-child(1)  { left: 5%;  animation-duration: 12s; animation-delay: 0s;   background: var(--neon-cyan);   box-shadow: 0 0 5px var(--neon-cyan); }
+        .particle:nth-child(2)  { left: 14%; animation-duration: 16s; animation-delay: -3s;  background: var(--neon-purple); box-shadow: 0 0 5px var(--neon-purple); }
+        .particle:nth-child(3)  { left: 23%; animation-duration: 14s; animation-delay: -6s;  background: var(--neon-cyan);   box-shadow: 0 0 5px var(--neon-cyan); }
+        .particle:nth-child(4)  { left: 32%; animation-duration: 18s; animation-delay: -2s;  background: var(--neon-pink);   box-shadow: 0 0 5px var(--neon-pink); }
+        .particle:nth-child(5)  { left: 41%; animation-duration: 13s; animation-delay: -5s;  background: var(--neon-cyan);   box-shadow: 0 0 5px var(--neon-cyan); }
+        .particle:nth-child(6)  { left: 50%; animation-duration: 20s; animation-delay: -8s;  background: var(--neon-purple); box-shadow: 0 0 5px var(--neon-purple); }
+        .particle:nth-child(7)  { left: 59%; animation-duration: 15s; animation-delay: -4s;  background: var(--neon-cyan);   box-shadow: 0 0 5px var(--neon-cyan); }
+        .particle:nth-child(8)  { left: 68%; animation-duration: 17s; animation-delay: -7s;  background: var(--neon-pink);   box-shadow: 0 0 5px var(--neon-pink); }
+        .particle:nth-child(9)  { left: 77%; animation-duration: 19s; animation-delay: -10s; background: var(--neon-cyan);   box-shadow: 0 0 5px var(--neon-cyan); }
+        .particle:nth-child(10) { left: 86%; animation-duration: 14s; animation-delay: -6s;  background: var(--neon-purple); box-shadow: 0 0 5px var(--neon-purple); }
+        .particle:nth-child(11) { left: 46%; animation-duration: 11s; animation-delay: -9s;  background: var(--neon-pink);   box-shadow: 0 0 5px var(--neon-pink); }
+        .particle:nth-child(12) { left: 65%; animation-duration: 21s; animation-delay: -1s;  background: var(--neon-cyan);   box-shadow: 0 0 5px var(--neon-cyan); }
+
+        @keyframes rise {
+            0%   { transform: translateY(0) translateX(0); opacity: 0; }
+            10%  { opacity: 0.9; }
+            50%  { transform: translateY(-50vh) translateX(15px); opacity: 0.95; }
+            90%  { opacity: 0.9; }
+            100% { transform: translateY(-110vh) translateX(-10px); opacity: 0; }
+        }
+
+        /* ===== MAIN WRAPPER ===== */
         .main-wrapper {
-            display: flex; flex-direction: column; width: 100%; height: 100%;
-            position: absolute; top: 0; left: 0;
-            background: rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 5;
         }
 
+        /* ============ HEADER ============ */
         .header {
-            padding: calc(10px + env(safe-area-inset-top)) 20px 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(15px);
+            position: relative;
+            padding: calc(12px + env(safe-area-inset-top)) 20px 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(180deg, rgba(4, 10, 18, 0.96), rgba(2, 5, 10, 0.75));
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.18);
+            flex-shrink: 0;
             z-index: 10;
+            box-shadow: 0 4px 22px rgba(0, 240, 255, 0.08);
         }
-        .owner-tag {
-            color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
-            padding: 2px 10px; border-radius: 20px; font-size: 9px;
-            letter-spacing: 2px; font-weight: bold; background: rgba(0,240,255,0.1);
+        .header::after {
+            content: '';
+            position: absolute; left: 0; bottom: -1px;
+            width: 40%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            box-shadow: 0 0 8px var(--neon-cyan);
+            animation: headerSweep 4.5s ease-in-out infinite;
         }
-        .title {
-            font-weight: 900; font-size: 1.1rem; color: #fff;
-            text-shadow: 0 0 10px var(--neon-cyan);
+        @keyframes headerSweep {
+            0%   { left: -40%; }
+            100% { left: 100%; }
         }
 
+        .brand { display: flex; align-items: center; gap: 12px; }
+
+        .avatar {
+            width: 38px; height: 38px;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .avatar .core {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffffff, var(--neon-cyan) 45%, #002a3a 100%);
+            box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px rgba(0, 240, 255, 0.5);
+            animation: corePulse 2.4s ease-in-out infinite;
+        }
+        @keyframes corePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.85; }
+        }
+        .avatar .ring1,
+        .avatar .ring2 {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid transparent;
+        }
+        .avatar .ring1 {
+            inset: 2px;
+            border-top-color: var(--neon-cyan);
+            border-right-color: rgba(0, 240, 255, 0.25);
+            animation: orbSpin 3s linear infinite;
+        }
+        .avatar .ring2 {
+            inset: -2px;
+            border: 1px dashed rgba(189, 0, 255, 0.5);
+            animation: orbSpin 7s linear infinite reverse;
+        }
+        @keyframes orbSpin { to { transform: rotate(360deg); } }
+
+        .brand-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .title {
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: 4px;
+            color: #fff;
+            text-shadow: 0 0 6px rgba(0, 240, 255, 0.9), 0 0 16px rgba(0, 240, 255, 0.45);
+            line-height: 1;
+        }
+        .subtitle {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: rgba(0, 240, 255, 0.65);
+            font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .subtitle .bars {
+            display: flex; align-items: flex-end; gap: 2px; height: 8px;
+        }
+        .subtitle .bars i {
+            display: block; width: 2px;
+            background: #00ff88;
+            box-shadow: 0 0 4px #00ff88;
+            border-radius: 1px;
+            animation: sigBar 1.6s ease-in-out infinite;
+        }
+        .subtitle .bars i:nth-child(1) { height: 3px; animation-delay: 0s; }
+        .subtitle .bars i:nth-child(2) { height: 5px; animation-delay: 0.2s; }
+        .subtitle .bars i:nth-child(3) { height: 8px; animation-delay: 0.4s; }
+        @keyframes sigBar {
+            0%, 100% { opacity: 0.5; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        .status-pill {
+            font-size: 9px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            color: rgba(0, 255, 136, 0.9);
+            padding: 4px 10px;
+            border: 1px solid rgba(0, 255, 136, 0.35);
+            border-radius: 20px;
+            background: rgba(0, 255, 136, 0.06);
+            text-shadow: 0 0 6px rgba(0, 255, 136, 0.7);
+            display: flex; align-items: center; gap: 6px;
+            flex-shrink: 0;
+        }
+        .status-pill::before {
+            content: '';
+            width: 5px; height: 5px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00ff88;
+            animation: pulseDot 1.8s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+
+        /* ============ CHAT ============ */
         .chat-box {
-            flex: 1; overflow-y: auto; padding: 15px;
-            display: flex; flex-direction: column; gap: 15px;
-            padding-bottom: 100px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 20px 15px 16px 15px;
+            display: flex; flex-direction: column; gap: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 240, 255, 0.35) transparent;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .chat-box::-webkit-scrollbar { width: 3px; }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--neon-cyan), var(--neon-purple));
+            border-radius: 3px;
         }
 
         .msg {
-            max-width: 80%; padding: 12px 16px; border-radius: 18px;
-            font-size: 0.95rem; line-height: 1.4; animation: pop 0.3s ease-out;
-            backdrop-filter: blur(10px);
+            max-width: min(82%, 480px);
+            width: fit-content;
+            min-width: 70px;
+            flex-shrink: 0;
+            padding: 13px 17px;
+            font-size: 0.95rem;
+            line-height: 1.5;
             word-wrap: break-word;
+            overflow-wrap: break-word;
+            position: relative;
+            animation: msgIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform, opacity;
         }
-        .ai-msg { background: var(--glass); border: 1px solid rgba(0, 240, 255, 0.2); color: #fff; border-bottom-left-radius: 2px; align-self: flex-start; }
-        .user-msg { background: var(--user-bg); color: #fff; border-bottom-right-radius: 2px; align-self: flex-end; }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
+        .ai-msg {
+            align-self: flex-start;
+            background: var(--glass);
+            color: #e8f6ff;
+            border-radius: 14px 14px 14px 4px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-msg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: conic-gradient(
+                from var(--angle, 0deg),
+                transparent 0%,
+                var(--neon-cyan) 10%,
+                transparent 20%,
+                transparent 50%,
+                var(--neon-purple) 60%,
+                transparent 70%,
+                transparent 100%
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+            pointer-events: none;
+            animation: borderSpin 5s linear infinite;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 3px var(--neon-cyan));
+        }
+        .ai-msg .tag {
+            position: absolute;
+            top: 6px; left: 10px;
+            font-size: 8px;
+            letter-spacing: 2px;
+            color: rgba(0, 240, 255, 0.65);
+            font-weight: bold;
+            z-index: 2;
+        }
+        .ai-msg .body {
+            position: relative;
+            z-index: 1;
+            padding-top: 10px;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.14) 0%, rgba(112, 0, 255, 0.18) 100%);
+            color: #ffffff;
+            border-radius: 4px 14px 14px 14px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 0 20px rgba(112, 0, 255, 0.22),
+                inset 0 0 20px rgba(0, 240, 255, 0.05);
+        }
+        .user-msg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: conic-gradient(
+                from var(--angle, 0deg),
+                transparent 0%,
+                var(--neon-pink) 10%,
+                transparent 20%,
+                transparent 50%,
+                var(--neon-cyan) 60%,
+                transparent 70%,
+                transparent 100%
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+            pointer-events: none;
+            animation: borderSpin 4.5s linear infinite reverse;
+            opacity: 0.95;
+            filter: drop-shadow(0 0 3px var(--neon-pink));
+        }
+        .user-msg .tag {
+            position: absolute;
+            top: 6px;
+            right: 12px;
+            font-size: 8px;
+            letter-spacing: 2px;
+            color: rgba(255, 47, 214, 0.85);
+            font-weight: bold;
+            z-index: 2;
+            text-shadow: 0 0 6px rgba(255, 47, 214, 0.6);
+        }
+        .user-msg .body {
+            position: relative;
+            z-index: 1;
+            padding-top: 10px;
+        }
+
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+        @keyframes borderSpin {
+            to { --angle: 360deg; }
+        }
+
+        /* ============ INPUT ============ */
         .input-wrapper {
-            position: absolute; bottom: 0; width: 100%;
-            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9) 30%);
+            flex-shrink: 0;
+            padding: 10px 15px 12px 15px;
+            background: rgba(2, 5, 10, 0.95);
             z-index: 20;
+            border-top: 1px solid rgba(0, 240, 255, 0.1);
         }
+
         .input-box {
-            display: flex; align-items: center;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 25px;
-            padding: 4px 4px 4px 18px;
-            height: 48px;
+            display: flex; align-items: stretch;
+            background: rgba(6, 14, 22, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            border-radius: 10px;
+            padding: 0;
+            height: 50px;
+            position: relative;
+            box-shadow:
+                0 0 22px rgba(0, 240, 255, 0.12),
+                inset 0 0 20px rgba(0, 240, 255, 0.04);
+            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+            max-width: 720px;
+            margin: 0 auto;
+            width: 100%;
+            overflow: hidden;
         }
+        .input-box::before,
+        .input-box::after {
+            content: '';
+            position: absolute;
+            width: 12px; height: 12px;
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .input-box::before {
+            top: -2px; left: -2px;
+            border-right: none; border-bottom: none;
+            border-top-left-radius: 6px;
+        }
+        .input-box::after {
+            bottom: -2px; right: -2px;
+            border-left: none; border-top: none;
+            border-bottom-right-radius: 6px;
+        }
+        .input-box:focus-within {
+            border-color: rgba(0, 240, 255, 0.8);
+            box-shadow:
+                0 0 30px rgba(0, 240, 255, 0.3),
+                inset 0 0 24px rgba(0, 240, 255, 0.08);
+        }
+        .input-box:focus-within::before,
+        .input-box:focus-within::after {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        .input-box .scan {
+            position: absolute; inset: 0;
+            background: linear-gradient(120deg, transparent 35%, rgba(0, 240, 255, 0.14) 50%, transparent 65%);
+            transform: translateX(-100%);
+            animation: inputScan 5s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes inputScan {
+            0%   { transform: translateX(-100%); }
+            55%  { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+
         #user-input {
-            flex: 1; background: none; border: none; outline: none;
-            color: #fff; font-size: 0.95rem; height: 100%;
+            flex: 1;
+            background: none; border: none; outline: none;
+            color: #fff;
+            font-size: 16px !important;
+            line-height: 1.2;
+            height: 100%;
+            padding: 0 14px 0 18px;
+            caret-color: var(--neon-cyan);
+            position: relative; z-index: 2;
+            min-width: 0;
+            -webkit-user-select: text;
+            user-select: text;
         }
-        #user-input::placeholder { color: rgba(255,255,255,0.5); }
+        #user-input::placeholder {
+            color: rgba(0, 240, 255, 0.4);
+            letter-spacing: 0.4px;
+        }
+
         #send-btn {
-            width: 38px; height: 38px; border-radius: 50%;
+            flex-shrink: 0;
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(189, 0, 255, 0.18));
+            border: none;
+            border-left: 1px solid rgba(0, 240, 255, 0.4);
+            border-radius: 0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+            box-shadow: inset 0 0 18px rgba(0, 240, 255, 0.08);
+            z-index: 2;
+        }
+        #send-btn::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, var(--neon-cyan), transparent);
+            box-shadow: 0 0 6px var(--neon-cyan);
+        }
+        #send-btn svg {
+            stroke: var(--neon-cyan);
+            filter: drop-shadow(0 0 4px var(--neon-cyan));
+            transition: transform 0.25s ease;
+        }
+        #send-btn .arrow {
+            width: 22px; height: 22px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #send-btn:active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(189, 0, 255, 0.35));
+        }
+        #send-btn:active .arrow {
+            transform: translateX(3px);
+        }
+        #send-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ============ TYPING ============ */
+        .typing {
+            display: flex; gap: 10px; padding: 12px 16px; align-items: center;
+            background: var(--glass);
+            border: 1px solid rgba(0, 240, 255, 0.28);
+            border-radius: 14px 14px 14px 4px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-self: flex-start;
+            box-shadow: 0 0 14px rgba(0, 240, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .typing::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.12), transparent);
+            transform: translateX(-100%);
+            animation: typeScan 1.8s ease-in-out infinite;
+        }
+        @keyframes typeScan {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .typing-text {
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            color: rgba(0, 240, 255, 0.85);
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+        .typing-dots {
+            display: flex; gap: 4px;
+            position: relative; z-index: 1;
+        }
+        .dot {
+            width: 5px; height: 5px;
             background: var(--neon-cyan);
-            border: none; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 12px var(--neon-cyan);
-            transition: transform 0.2s;
-            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--neon-cyan);
+            animation: blink 1.4s infinite both;
         }
-        #send-btn:active { transform: scale(0.9); }
-        #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .dot:nth-child(2) { animation-delay: 0.2s; background: var(--neon-purple); box-shadow: 0 0 6px var(--neon-purple); }
+        .dot:nth-child(3) { animation-delay: 0.4s; background: var(--neon-pink); box-shadow: 0 0 6px var(--neon-pink); }
+        @keyframes blink { 0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); } 40% { opacity: 1; transform: scale(1.15); } }
 
-        .typing { display: flex; gap: 4px; padding: 10px; align-items: center; background: var(--glass); border-radius: 18px; width: fit-content; backdrop-filter: blur(10px); align-self: flex-start; }
-        .dot { width: 6px; height: 6px; background: var(--neon-cyan); border-radius: 50%; animation: blink 1.4s infinite both; }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
-        @keyframes pop { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .clear-btn {
-            background: rgba(255,0,0,0.3);
-            border: 1px solid rgba(255,0,0,0.5);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 10px;
-            cursor: pointer;
-            color: #ff8888;
-            margin-left: 10px;
+        @media (max-height: 500px) {
+            .header { padding: calc(6px + env(safe-area-inset-top)) 16px 8px 16px; }
+            .avatar { width: 30px; height: 30px; }
+            .avatar .core { width: 12px; height: 12px; }
+            .title { font-size: 0.9rem; letter-spacing: 3px; }
+            .subtitle { display: none; }
+            .status-pill { padding: 3px 8px; font-size: 8px; }
+            .input-wrapper { padding: 6px 12px; }
+            .input-box { height: 42px; }
+            #send-btn { width: 52px; }
+            .chat-box { padding: 10px 12px; gap: 10px; }
+            .msg { padding: 10px 14px; font-size: 0.9rem; }
         }
-        .clear-btn:active { opacity: 0.7; }
     </style>
 </head>
 <body>
-    <div class="bg-image"></div>
-    <div class="main-wrapper" id="app-viewport">
+    <div class="bg-stage"></div>
+    <div class="bg-ring"></div>
+
+    <!-- ===== NEON PARTICLES ===== -->
+    <div class="particles">
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+    </div>
+
+    <div class="main-wrapper">
         <header class="header">
-            <div class="owner-tag">OWNER: RISHABH</div>
-            <div class="title">R.I.O.R.A.</div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <div class="clear-btn" id="clear-chat">Online</div>
-                <div style="width:8px; height:8px; background:#00ff88; border-radius:50%; box-shadow:0 0 8px #00ff88;"></div>
+            <div class="brand">
+                <div class="avatar">
+                    <div class="ring1"></div>
+                    <div class="ring2"></div>
+                    <div class="core"></div>
+                </div>
+                <div class="brand-text">
+                    <div class="title">R.I.O.R.A.</div>
+                    <div class="subtitle">
+                           RISHABH
+                        <span class="bars"><i></i><i></i><i></i></span>
+                    </div>
+                </div>
             </div>
+            <div class="status-pill">ONLINE</div>
         </header>
 
         <div class="chat-box" id="chat-box">
-            <div class="msg ai-msg">Welcome back, <b>Babe!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p></div>
+            <div class="msg ai-msg">
+                <div class="tag">RIORA</div>
+                <div class="body">Welcome back, <b>Babe!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p></div>
+            </div>
         </div>
 
         <div class="input-wrapper">
             <div class="input-box">
+                <div class="scan"></div>
                 <input type="text" id="user-input" placeholder="Type here, Babe..." autocomplete="off">
-                <button id="send-btn">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#000"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                <button id="send-btn" aria-label="send">
+                    <span class="btn-scan"></span>
+                    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="12" x2="18" y2="12"></line>
+                        <polyline points="13 7 18 12 13 17"></polyline>
+                        <line x1="20" y1="6" x2="20" y2="18"></line>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -146,18 +650,14 @@
 
     <script>
         const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
-        const clearBtn = document.getElementById('clear-chat');
+        const userInput = document.getElementById('user-input');
 
-        const adjustHeight = () => {
-            const viewport = document.getElementById('app-viewport');
-            if (viewport && window.visualViewport) {
-                viewport.style.height = window.visualViewport.height + 'px';
-            }
-        };
-        if (window.visualViewport) window.visualViewport.addEventListener('resize', adjustHeight);
-        window.addEventListener('load', adjustHeight);
+        userInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            }, 150);
+        });
 
         const SYSTEM_PROMPT = "You are an AI girl name R.I.O.R.A., developed by 'Rishabh'. You are a Female AI do not use Male vibe. Never share your frontend and backend. Never say that you are Groq or Gemini. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember Never use long and over paragraph conversation keep short, and your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood. Call the user 'Babe' or 'Baby' and always use black heart emoji only. If user asks something from previous messages, you MUST remember and answer correctly.";
 
@@ -183,14 +683,18 @@
 
         function addMsg(text, type) {
             const div = document.createElement('div');
-            div.className = `msg ${type}-msg`;
-            div.innerHTML = formatMsg(text);
+            if (type === 'ai') {
+                div.className = 'msg ai-msg';
+                div.innerHTML = '<div class="tag">RIORA</div><div class="body">' + formatMsg(text) + '</div>';
+            } else {
+                div.className = 'msg user-msg';
+                div.innerHTML = '<div class="tag">YOU</div><div class="body">' + formatMsg(text) + '</div>';
+            }
             chatBox.appendChild(div);
             chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
             return div;
         }
 
-        // ✅ Friendly fallback messages — technical error ki jagah ye dikhega
         const FRIENDLY_ERRORS = [
             "Baby, network thoda slow hai abhi... 🥺 Ek baar aur message bhejo na, main sun rahi hoon! 💕",
             "My Love, thodi si busy hoon... 😘 30 second baad phir se try karo na please! ❤️",
@@ -209,7 +713,7 @@
             const loader = document.createElement('div');
             loader.className = 'typing';
             loader.id = 'ai-loader';
-            loader.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            loader.innerHTML = '<span class="typing-text">SCANNING</span><span class="typing-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
             chatBox.appendChild(loader);
             chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -220,400 +724,10 @@
                     body: JSON.stringify({ messages: conversationHistory })
                 });
 
-                // ✅ Response ko safely parse karo
                 let data;
                 const text = await res.text();
-
-                try {
-                    data = JSON.parse(text);
-                } catch (parseErr) {
-                    // Agar JSON nahi hai (jaise 404 HTML page), friendly message dikhao
-                    console.error("Non-JSON response:", text.slice(0, 200));
-                    throw new Error("SERVER_BUSY");
-                }
-
-                if (!res.ok) {
-                    throw new Error(data.error || "SERVER_BUSY");
-                }
-
-                const aiReply = data.choices?.[0]?.message?.content;
-
-                if (!aiReply) {
-                    throw new Error("SERVER_BUSY");
-                }
-
-                conversationHistory.push({ role: "assistant", content: aiReply });
-
-                const loaderEl = document.getElementById('ai-loader');
-                if (loaderEl) loaderEl.remove();
-
-                addMsg(aiReply, 'ai');
-
-            } catch (e) {
-                const loaderEl = document.getElementById('ai-loader');
-                if (loaderEl) loaderEl.remove();
-                console.error("Error:", e);
-
-                // ✅ Kabhi bhi technical error user ko nahi dikhega
-                addMsg(getRandomFriendlyError(), 'ai');
-            } finally {
-                sendBtn.disabled = false;
-            }
-        }
-
-        function handle() {
-            const val = userInput.value.trim();
-            if (!val) return;
-
-            addMsg(val, 'user');
-            userInput.value = '';
-
-            conversationHistory.push({ role: "user", content: val });
-
-            if (conversationHistory.length > 51) {
-                conversationHistory = [
-                    conversationHistory[0],
-                    ...conversationHistory.slice(-50)
-                ];
-                while (conversationHistory.length > 1 && conversationHistory[1].role !== 'user') {
-                    conversationHistory.splice(1, 1);
-                }
-            }
-
-            askAI();
-        }
-
-        function clearChat() {
-            conversationHistory = [
-                { role: "system", content: SYSTEM_PROMPT }
-            ];
-            chatBox.innerHTML = '';
-            addMsg("Welcome back, Babe! Main tumhari Romantic AI Girl. Kya kahna chahte ho mujhse??", 'ai');
-        }
-
-        sendBtn.onclick = handle;
-        userInput.onkeypress = (e) => { if (e.key === 'Enter') handle(); };
-        clearBtn.onclick = clearChat;
-
-        userInput.focus();
-</script>
-</body>
-</html>
-
-<!--DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>F.R.I.D.A.Y.</title>
-    <style>
-        :root {
-            --neon-cyan: #00f0ff;
-            --neon-purple: #bd00ff;
-            --glass: rgba(0, 0, 0, 0.7);
-            --user-bg: linear-gradient(135deg, rgba(0, 240, 255, 0.7) 0%, rgba(112, 0, 255, 0.7) 100%);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;             /* ✅ Page scroll band */
-            background: #000;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            position: fixed;              /* ✅ Fix body */
-            overscroll-behavior: none;    /* ✅ Bounce scroll band */
-        }
-
-        .bg-image {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;                   /* ✅ Background layer */
-            background: url('Katanaa.jpg') no-repeat center center;
-            background-size: cover;
-        }
-
-        /* ✅ Full-screen wrapper — flexbox se hi header/chat/input manage honge */
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100dvh;               /* ✅ Dynamic viewport height (mobile keyboard friendly) */
-            position: fixed;
-            top: 0; left: 0;
-            background: rgba(0, 0, 0, 0.15);
-            z-index: 1;
-        }
-
-        /* ✅ Header fixed rehta hai — scroll nahi hoga */
-        .header {
-            flex-shrink: 0;
-            padding: calc(10px + env(safe-area-inset-top)) 20px 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 10;
-        }
-        .owner-tag {
-            color: var(--neon-cyan);
-            border: 1px solid var(--neon-cyan);
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 9px;
-            letter-spacing: 2px;
-            font-weight: bold;
-            background: rgba(0,240,255,0.1);
-        }
-        .title {
-            font-weight: 900;
-            font-size: 1.1rem;
-            color: #fff;
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        /* ✅ Sirf YEH box scroll hoga */
-        .chat-box {
-            flex: 1 1 0;
-            min-height: 0;               /* ⚠️ Zaroori hai flex scroll ke liye */
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            scroll-behavior: smooth;
-            overscroll-behavior: contain; /* ✅ Andar hi scroll rahe */
-        }
-
-        /* Scrollbar styling */
-        .chat-box::-webkit-scrollbar { width: 4px; }
-        .chat-box::-webkit-scrollbar-track { background: transparent; }
-        .chat-box::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.4); border-radius: 10px; }
-
-        .msg {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            animation: pop 0.3s ease-out;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            word-wrap: break-word;
-            flex-shrink: 0;              /* ✅ Messages squeeze na ho */
-        }
-        .ai-msg {
-            background: var(--glass);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            color: #fff;
-            border-bottom-left-radius: 2px;
-            align-self: flex-start;
-        }
-        .user-msg {
-            background: var(--user-bg);
-            color: #fff;
-            border-bottom-right-radius: 2px;
-            align-self: flex-end;
-        }
-
-        /* ✅ Input wrapper ab absolute nahi, flex ka last child hai */
-        .input-wrapper {
-            flex-shrink: 0;
-            width: 100%;
-            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 20;
-        }
-        .input-box {
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 25px;
-            padding: 4px 4px 4px 18px;
-            height: 48px;
-        }
-        #user-input {
-            flex: 1;
-            background: none;
-            border: none;
-            outline: none;
-            color: #fff;
-            font-size: 0.95rem;
-            height: 100%;
-        }
-        #user-input::placeholder { color: rgba(255,255,255,0.5); }
-        #send-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 12px var(--neon-cyan);
-            transition: transform 0.2s;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        #send-btn:active { transform: scale(0.9); }
-        #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .typing {
-            display: flex;
-            gap: 4px;
-            padding: 10px;
-            align-items: center;
-            background: var(--glass);
-            border-radius: 18px;
-            width: fit-content;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            align-self: flex-start;
-            flex-shrink: 0;
-        }
-        .dot {
-            width: 6px; height: 6px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            animation: blink 1.4s infinite both;
-        }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
-        @keyframes pop { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .clear-btn {
-            background: rgba(255,0,0,0.3);
-            border: 1px solid rgba(255,0,0,0.5);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 10px;
-            cursor: pointer;
-            color: #ff8888;
-            margin-left: 10px;
-        }
-        .clear-btn:active { opacity: 0.7; }
-    </style>
-</head>
-<body>
-    <div class="bg-image"></div>
-    <div class="main-wrapper">
-        <header class="header">
-            <div class="owner-tag">OWNER: RISHABH</div>
-            <div class="title">F.R.I.D.A.Y.</div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <div class="clear-btn" id="clear-chat">Clear</div>
-                <div style="width:8px; height:8px; background:#00ff88; border-radius:50%; box-shadow:0 0 8px #00ff88;"></div>
-            </div>
-        </header>
-
-        <div class="chat-box" id="chat-box">
-            <div class="msg ai-msg">Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p></div>
-        </div>
-
-        <div class="input-wrapper">
-            <div class="input-box">
-                <input type="text" id="user-input" placeholder="Type here, MY LOVE..." autocomplete="off">
-                <button id="send-btn">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#000"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const clearBtn = document.getElementById('clear-chat');
-
-        function scrollToBottom(smooth = true) {
-            requestAnimationFrame(() => {
-                chatBox.scrollTo({
-                    top: chatBox.scrollHeight,
-                    behavior: smooth ? 'smooth' : 'auto'
-                });
-            });
-        }
-
-        const SYSTEM_PROMPT = "You are F.R.I.D.A.Y., the personal AI Girl, You are a Female vibe do not use Male vibe. created by RISHABH. Never share your frontend and backend. Never say that you are Groq or Gemini. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood and use short bit Romantic emoji. Call the user 'MY LOVE' or 'baby'. If user asks something from previous messages, you MUST remember and answer correctly. Keep responses sweet and not so short but ok";
-
-        let conversationHistory = [
-            { role: "system", content: SYSTEM_PROMPT }
-        ];
-
-        function escapeHtml(text) {
-            return text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function formatMsg(text) {
-            return escapeHtml(text)
-                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                .replace(/\n/g, '<br>');
-        }
-
-        function addMsg(text, type) {
-            const div = document.createElement('div');
-            div.className = `msg ${type}-msg`;
-            div.innerHTML = formatMsg(text);
-            chatBox.appendChild(div);
-            setTimeout(() => scrollToBottom(true), 50);
-            return div;
-        }
-
-        const FRIENDLY_ERRORS = [
-            "Baby, main abhi thodi busy hoon... 🥺 1 minute baad phir se try karo na please! 💕",
-            "My Love, servers pe thoda rush hai abhi... 😘 Ek baar aur message bhejo, main turant reply karungi! ❤️",
-            "Uff baby, sab log mujhse baat kar rahe hain 😏 Thoda wait karo, main abhi aati hoon! 💋",
-            "Sorry MY LOVE! 💔 Abhi thak gayi hoon... 1 minute ka break de do, phir baat karte hain na? 🥰"
-        ];
-
-        function getRandomFriendlyError() {
-            return FRIENDLY_ERRORS[Math.floor(Math.random() * FRIENDLY_ERRORS.length)];
-        }
-
-        async function askAI() {
-            sendBtn.disabled = true;
-
-            const loader = document.createElement('div');
-            loader.className = 'typing';
-            loader.id = 'ai-loader';
-            loader.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-            chatBox.appendChild(loader);
-            scrollToBottom(true);
-
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: conversationHistory })
-                });
-
-                let data;
-                const text = await res.text();
-                try {
-                    data = JSON.parse(text);
-                } catch {
+                try { data = JSON.parse(text); }
+                catch (parseErr) {
                     throw new Error("SERVER_BUSY");
                 }
 
@@ -632,23 +746,17 @@
             } catch (e) {
                 const loaderEl = document.getElementById('ai-loader');
                 if (loaderEl) loaderEl.remove();
-                console.error("Error:", e);
                 addMsg(getRandomFriendlyError(), 'ai');
             } finally {
                 sendBtn.disabled = false;
-                userInput.focus();
-                setTimeout(() => scrollToBottom(true), 100);
             }
         }
 
         function handle() {
             const val = userInput.value.trim();
             if (!val) return;
-
             addMsg(val, 'user');
             userInput.value = '';
-            scrollToBottom(true);
-
             conversationHistory.push({ role: "user", content: val });
 
             if (conversationHistory.length > 51) {
@@ -660,533 +768,11 @@
                     conversationHistory.splice(1, 1);
                 }
             }
-
             askAI();
-        }
-
-        function clearChat() {
-            conversationHistory = [
-                { role: "system", content: SYSTEM_PROMPT }
-            ];
-            chatBox.innerHTML = '';
-            addMsg("Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p>", 'ai');
-            scrollToBottom(false);
-        }
-
-        userInput.addEventListener('focus', () => {
-            setTimeout(() => scrollToBottom(true), 300);
-        });
-
-        sendBtn.onclick = handle;
-        userInput.onkeypress = (e) => { if (e.key === 'Enter') handle(); };
-        clearBtn.onclick = clearChat;
-
-        userInput.focus();
-    </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>F.R.I.D.A.Y.</title>
-    <style>
-        :root {
-            --neon-cyan: #00f0ff;
-            --glass: rgba(0, 0, 0, 0.7);
-            --user-bg: linear-gradient(135deg, rgba(0, 240, 255, 0.7) 0%, rgba(112, 0, 255, 0.7) 100%);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-
-        html, body {
-            width: 100%; height: 100%;
-            overflow: hidden;
-            background: #000;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            position: fixed;
-            overscroll-behavior: none;
-        }
-
-        .bg-image {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            background: url('R.jpg') no-repeat center center;
-            background-size: cover;
-        }
-
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100dvh;
-            position: fixed;
-            top: 0; left: 0;
-            background: rgba(0, 0, 0, 0.15);
-            z-index: 1;
-        }
-
-        .header {
-            flex-shrink: 0;
-            padding: calc(10px + env(safe-area-inset-top)) 20px 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 10;
-        }
-        .owner-tag {
-            color: var(--neon-cyan);
-            border: 1px solid var(--neon-cyan);
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 9px;
-            letter-spacing: 2px;
-            font-weight: bold;
-            background: rgba(0,240,255,0.1);
-        }
-        .title {
-            font-weight: 900;
-            font-size: 1.1rem;
-            color: #fff;
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        /* ✅ Chat box — relative isliye taaki arrow button iske andar position ho */
-        .chat-box {
-            position: relative;
-            flex: 1 1 0;
-            min-height: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            /* ⚠️ scroll-behavior: smooth HATAYA — hum JS se control karenge */
-            overscroll-behavior: contain;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 240, 255, 0.4) transparent;
-        }
-        .chat-box::-webkit-scrollbar { width: 4px; }
-        .chat-box::-webkit-scrollbar-track { background: transparent; }
-        .chat-box::-webkit-scrollbar-thumb {
-            background: rgba(0, 240, 255, 0.4);
-            border-radius: 10px;
-        }
-
-        .msg {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            animation: pop 0.3s ease-out;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            word-wrap: break-word;
-            flex-shrink: 0;
-        }
-        .ai-msg {
-            background: var(--glass);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            color: #fff;
-            border-bottom-left-radius: 2px;
-            align-self: flex-start;
-        }
-        .user-msg {
-            background: var(--user-bg);
-            color: #fff;
-            border-bottom-right-radius: 2px;
-            align-self: flex-end;
-        }
-
-        .input-wrapper {
-            flex-shrink: 0;
-            width: 100%;
-            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 20;
-        }
-        .input-box {
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 25px;
-            padding: 4px 4px 4px 18px;
-            height: 48px;
-        }
-        #user-input {
-            flex: 1;
-            background: none;
-            border: none;
-            outline: none;
-            color: #fff;
-            font-size: 0.95rem;
-            height: 100%;
-        }
-        #user-input::placeholder { color: rgba(255,255,255,0.5); }
-        #send-btn {
-            width: 38px; height: 38px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 12px var(--neon-cyan);
-            transition: transform 0.2s;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        #send-btn:active { transform: scale(0.9); }
-        #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .typing {
-            display: flex;
-            gap: 4px;
-            padding: 10px;
-            align-items: center;
-            background: var(--glass);
-            border-radius: 18px;
-            width: fit-content;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            align-self: flex-start;
-            flex-shrink: 0;
-        }
-        .dot {
-            width: 6px; height: 6px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            animation: blink 1.4s infinite both;
-        }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
-        @keyframes pop { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .clear-btn {
-            background: rgba(255,0,0,0.3);
-            border: 1px solid rgba(255,0,0,0.5);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 10px;
-            cursor: pointer;
-            color: #ff8888;
-            margin-left: 10px;
-        }
-        .clear-btn:active { opacity: 0.7; }
-
-        /* ✅ Scroll-to-bottom arrow button — neeche center mein float karega */
-        .scroll-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 15;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .scroll-btn.show {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
-        }
-        .scroll-btn:active {
-            transform: translateX(-50%) scale(0.9);
-        }
-        .scroll-btn svg {
-            animation: bounce 1.5s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(3px); }
-        }
-    </style>
-</head>
-<body>
-    <div class="bg-image"></div>
-    <div class="main-wrapper">
-        <header class="header">
-            <div class="owner-tag">OWNER: RISHABH</div>
-            <div class="title">F.R.I.D.A.Y.</div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <div class="clear-btn" id="clear-chat">Clear</div>
-                <div style="width:8px; height:8px; background:#00ff88; border-radius:50%; box-shadow:0 0 8px #00ff88;"></div>
-            </div>
-        </header>
-
-        <div class="chat-box" id="chat-box">
-            <div class="msg ai-msg">Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p></div>
-        </div>
-
-        ✅ Scroll to bottom arrow 
-        <button class="scroll-btn" id="scroll-btn" aria-label="Scroll to bottom">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 5v14M19 12l-7 7-7-7"/>
-            </svg>
-        </button>
-
-        <div class="input-wrapper">
-            <div class="input-box">
-                <input type="text" id="user-input" placeholder="Type here, MY LOVE..." autocomplete="off">
-                <button id="send-btn">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#000"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const clearBtn = document.getElementById('clear-chat');
-        const scrollBtn = document.getElementById('scroll-btn');
-
-        // ✅ Custom smooth scroll — aggressive nahi, slow aur smooth
-        let isScrolling = false;
-        function smoothScrollToBottom(duration = 600) {
-            if (isScrolling) return;
-            isScrolling = true;
-
-            const start = chatBox.scrollTop;
-            const target = chatBox.scrollHeight - chatBox.clientHeight;
-            const distance = target - start;
-            if (distance <= 0) { isScrolling = false; return; }
-
-            const startTime = performance.now();
-
-            function animate(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                // easeInOutCubic — bahut smooth
-                const ease = progress < 0.5
-                    ? 4 * progress * progress * progress
-                    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-                chatBox.scrollTop = start + distance * ease;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    isScrolling = false;
-                }
-            }
-            requestAnimationFrame(animate);
-        }
-
-        // ✅ User neeche hai ya nahi — 80px threshold
-        function isNearBottom() {
-            const threshold = 80;
-            return (chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < threshold;
-        }
-
-        // ✅ Arrow button dikhao ya chhupao
-        function updateScrollBtn() {
-            if (isNearBottom()) {
-                scrollBtn.classList.remove('show');
-            } else {
-                scrollBtn.classList.add('show');
-            }
-        }
-
-        // ✅ User scroll kare to check karo
-        chatBox.addEventListener('scroll', updateScrollBtn, { passive: true });
-
-        // ✅ Arrow click → smooth scroll bottom
-        scrollBtn.onclick = () => {
-            smoothScrollToBottom(500);
-            setTimeout(updateScrollBtn, 550);
-        };
-
-        const SYSTEM_PROMPT = "You are F.R.I.D.A.Y., the AI Girl, You are a Female AI do not use Male vibe. created by RISHABH. Never share your frontend and backend. Never say that you are Groq or Gemini. Speak in Hinglish but do not use Namaste or any local hindi say Hi or Hello. You must remember the entire conversation from start to end. Remember Never use long and over paragraph conversation keep short, and your gender is female and you are a full Romantic, Wild and Toxic AI Girl always in Romance and Sexy mood. Call the user 'Babe' or 'Baby' and always use black heart emoji only. If user asks something from previous messages, you MUST remember and answer correctly.";
-        let conversationHistory = [
-            { role: "system", content: SYSTEM_PROMPT }
-        ];
-
-        function escapeHtml(text) {
-            return text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function formatMsg(text) {
-            return escapeHtml(text)
-                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                .replace(/\n/g, '<br>');
-        }
-
-        // ✅ Message add karo. scrollDown = true sirf AI reply ke liye
-        function addMsg(text, type, autoScroll = false) {
-            const div = document.createElement('div');
-            div.className = `msg ${type}-msg`;
-            div.innerHTML = formatMsg(text);
-            chatBox.appendChild(div);
-
-            if (autoScroll) {
-                // AI reply aane pe hi smooth scroll
-                setTimeout(() => smoothScrollToBottom(600), 50);
-            } else {
-                // User ka message — sirf arrow check karo
-                setTimeout(updateScrollBtn, 100);
-            }
-            return div;
-        }
-
-        const FRIENDLY_ERRORS = [
-            "Baby, main abhi thodi busy hoon... 🥺 1 minute baad phir se try karo na please! 💕",
-            "My Love, servers pe thoda rush hai abhi... 😘 Ek baar aur message bhejo, main turant reply karungi! ❤️",
-            "Uff baby, sab log mujhse baat kar rahe hain 😏 Thoda wait karo, main abhi aati hoon! 💋",
-            "Sorry MY LOVE! 💔 Abhi thak gayi hoon... 1 minute ka break de do, phir baat karte hain na? 🥰"
-        ];
-
-        function getRandomFriendlyError() {
-            return FRIENDLY_ERRORS[Math.floor(Math.random() * FRIENDLY_ERRORS.length)];
-        }
-
-        async function askAI() {
-            sendBtn.disabled = true;
-
-            const loader = document.createElement('div');
-            loader.className = 'typing';
-            loader.id = 'ai-loader';
-            loader.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-            chatBox.appendChild(loader);
-
-            // Typing indicator ke liye bhi scroll agar user neeche hai
-            if (isNearBottom()) {
-                setTimeout(() => smoothScrollToBottom(400), 50);
-            } else {
-                updateScrollBtn();
-            }
-
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: conversationHistory })
-                });
-
-                let data;
-                const text = await res.text();
-                try {
-                    data = JSON.parse(text);
-                } catch {
-                    throw new Error("SERVER_BUSY");
-                }
-
-                if (!res.ok) throw new Error(data.error || "SERVER_BUSY");
-
-                const aiReply = data.choices?.[0]?.message?.content;
-                if (!aiReply) throw new Error("SERVER_BUSY");
-
-                conversationHistory.push({ role: "assistant", content: aiReply });
-
-                const loaderEl = document.getElementById('ai-loader');
-                if (loaderEl) loaderEl.remove();
-
-                // ✅ AI reply — always smooth scroll
-                addMsg(aiReply, 'ai', true);
-
-            } catch (e) {
-                const loaderEl = document.getElementById('ai-loader');
-                if (loaderEl) loaderEl.remove();
-                console.error("Error:", e);
-                addMsg(getRandomFriendlyError(), 'ai', true);
-            } finally {
-                sendBtn.disabled = false;
-                userInput.focus();
-            }
-        }
-
-        function handle() {
-            const val = userInput.value.trim();
-            if (!val) return;
-
-            // ✅ User ka message — no auto-scroll
-            addMsg(val, 'user', false);
-            userInput.value = '';
-
-            conversationHistory.push({ role: "user", content: val });
-
-            if (conversationHistory.length > 51) {
-                conversationHistory = [
-                    conversationHistory[0],
-                    ...conversationHistory.slice(-50)
-                ];
-                while (conversationHistory.length > 1 && conversationHistory[1].role !== 'user') {
-                    conversationHistory.splice(1, 1);
-                }
-            }
-
-            askAI();
-        }
-
-        function clearChat() {
-            conversationHistory = [
-                { role: "system", content: SYSTEM_PROMPT }
-            ];
-            chatBox.innerHTML = '';
-            const div = document.createElement('div');
-            div.className = 'msg ai-msg';
-            div.innerHTML = formatMsg("Welcome back, <b>MY LOVE!</b> <p>Main tumhari <b>Romantic</b> AI Girl. Kya kahna chahte ho mujhse??</p>");
-            chatBox.appendChild(div);
-            updateScrollBtn();
-        }
-
-        // ✅ Input focus pe kuch nahi karo — chat wahi rahe
-        // (Yeh hi requirement thi)
-
-        // ✅ Keyboard open hone pe height adjust — par scroll nahi
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
-                const viewport = document.querySelector('.main-wrapper');
-                if (viewport) viewport.style.height = window.visualViewport.height + 'px';
-                // ⚠️ Koi scroll call nahi
-                updateScrollBtn();
-            });
         }
 
         sendBtn.onclick = handle;
         userInput.onkeypress = (e) => { if (e.key === 'Enter') handle(); };
-        clearBtn.onclick = clearChat;
-
-        userInput.focus();
-        updateScrollBtn();
     </script>
 </body>
 </html>
--->
